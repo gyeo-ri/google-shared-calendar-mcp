@@ -1,6 +1,6 @@
 [project]
 name = "google-shared-calendar-mcp"
-version = "0.1.0"
+version = "0.1.1"
 description = "MCP server for Google Calendars shared with a service account"
 readme = "README.md"
 license = "MIT"
