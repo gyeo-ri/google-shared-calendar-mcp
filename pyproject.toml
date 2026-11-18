@@ -1,0 +1,28 @@
+[project]
+name = "google-shared-calendar-mcp"
+version = "0.1.0"
+description = "MCP server for Google Calendars shared with a service account"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.11"
+dependencies = [
+    "mcp>=2.3.0,<3",
+    "google-api-python-client>=2.202.0,<3",
+    "google-auth>=2.62.2,<3",
+]
+
+[project.scripts]
+google-shared-calendar-mcp = "google_shared_calendar_mcp.server:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.2.0,<10",
+]
+
+[build-system]
+requires = ["hatchling>=1.33.0,<2"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/google_shared_calendar_mcp"]
