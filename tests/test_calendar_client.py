@@ -107,3 +107,29 @@ def test_update_patches_only_given_fields(client, service):
     service.responses["events.patch"] = {"id": "e1", "start": {}, "end": {}}
     client.update_event("e1", summary="new")
     assert last_call(service)[1]["body"] == {"summary": "new"}
+
+
+def test_update_all_day_to_timed_clears_date(client, service):
+    service.responses["events.patch"] = {"id": "e1", "start": {}, "end": {}}
+    client.update_event("e1", start="2026-11-20T19:00:00", end="2026-11-20T20:00:00")
+    body = last_call(service)[1]["body"]
+    assert body["start"] == {
+        "dateTime": "2026-11-20T19:00:00",
+        "timeZone": "Asia/Seoul",
+        "date": None,
+    }
+
+
+def test_update_timed_to_all_day_clears_datetime(client, service):
+    service.responses["events.patch"] = {"id": "e1", "start": {}, "end": {}}
+    client.update_event("e1", start="2026-11-20", end="2026-11-20")
+    body = last_call(service)[1]["body"]
+    assert body["start"] == {"date": "2026-11-20", "dateTime": None, "timeZone": None}
+    assert body["end"] == {"date": "2026-11-21", "dateTime": None, "timeZone": None}
+
+
+def test_update_offset_datetime_clears_timezone(client, service):
+    service.responses["events.patch"] = {"id": "e1", "start": {}, "end": {}}
+    client.update_event("e1", start="2026-11-20T19:00:00+09:00", end="2026-11-20T20:00:00+09:00")
+    body = last_call(service)[1]["body"]
+    assert body["start"] == {"timeZone": None, "dateTime": "2026-11-20T19:00:00+09:00", "date": None}

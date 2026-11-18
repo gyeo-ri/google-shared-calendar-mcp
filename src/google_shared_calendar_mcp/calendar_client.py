@@ -41,6 +41,12 @@ def _parse_datetime(value: str) -> datetime:
     return datetime.fromisoformat(value)
 
 
+def _replace_time(body: dict[str, Any]) -> dict[str, Any]:
+    if "date" in body:
+        return {**body, "dateTime": None, "timeZone": None}
+    return {"timeZone": None, **body, "date": None}
+
+
 def _is_date_only(value: str) -> bool:
     return len(value) == 10 and value[4] == "-" and value[7] == "-"
 
@@ -219,7 +225,9 @@ class CalendarClient:
         if (start is None) != (end is None):
             raise ValueError("start and end must be provided together")
         if start is not None and end is not None:
-            body["start"], body["end"] = self._event_times(start, end, self.timezone_for(cid))
+            start_body, end_body = self._event_times(start, end, self.timezone_for(cid))
+            # patch merges nested objects, so clear the field of the other event type.
+            body["start"], body["end"] = _replace_time(start_body), _replace_time(end_body)
         if summary is not None:
             body["summary"] = summary
         if description is not None:
